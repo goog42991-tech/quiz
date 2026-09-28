@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบทดสอบความรู้ทั่วไป 10 ข้อ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 16px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .quiz-container {
+    background: #fff;
+    max-width: 640px;
+    width: 100%;
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    margin-top: 8px;
+  }
+  h1 {
+    text-align: center;
+    color: #4c1d95;
+    margin: 0 0 6px;
+    font-size: 1.35rem;
+  }
+  .subtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+  }
+  .bar-wrap {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  #bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s;
+  }
+  #progress {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  #question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.15s;
+    font-family: inherit;
+    color: #1e293b;
+    line-height: 1.4;
+  }
+  .option:active:not(:disabled) { transform: scale(0.98); }
+  .option:disabled { cursor: default; }
+  .option.correct { background: #dcfce7; border-color: #22c55e; font-weight: 600; }
+  .option.wrong { background: #fee2e2; border-color: #ef4444; }
+  .option.correct::after { content: " ✓"; color: #16a34a; }
+  .option.wrong::after { content: " ✗"; color: #dc2626; }
+  .feedback {
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    line-height: 1.55;
+    font-size: 0.95rem;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .correct-text { background: #f0fdf4; color: #166534; border-left: 4px solid #22c55e; }
+  .wrong-text { background: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; }
+  .btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 13px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 6px;
+    transition: 0.2s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  #result { text-align: center; display: none; }
+  #result h2 { color: #4c1d95; margin-bottom: 8px; }
+  #result .score {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 8px 0;
+  }
+  #result .msg { color: #475569; margin-bottom: 18px; font-size: 1.05rem; }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <h1>แบบทดสอบความรู้ทั่วไป</h1>
+  <div class="subtitle">จำนวน 10 ข้อ</div>
+  <div class="bar-wrap"><div id="bar"></div></div>
+
+  <div id="progress"></div>
+  <div id="question"></div>
+  <div id="options"></div>
+  <div id="feedback" class="feedback"></div>
+  <button id="nextBtn" class="btn" style="display:none;">ข้อถัดไป</button>
+
+  <div id="result">
+    <h2>สรุปผลคะแนน</h2>
+    <div class="score" id="scoreText"></div>
+    <div class="msg" id="msgText"></div>
+    <button class="btn" onclick="restart()">ทำแบบทดสอบอีกครั้ง</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "เมืองหลวงของประเทศไทยคือจังหวัดใด",
+    o: ["เชียงใหม่", "กรุงเทพมหานคร", "ขอนแก่น", "ภูเก็ต"],
+    a: 1,
+    e: "กรุงเทพมหานครเป็นเมืองหลวงของประเทศไทย"
+  },
+  {
+    q: "ประเทศไทยมีทั้งหมดกี่จังหวัด",
+    o: ["72 จังหวัด", "75 จังหวัด", "76 จังหวัด", "77 จังหวัด"],
+    a: 3,
+    e: "ประเทศไทยมี 77 จังหวัด แบ่งเป็นภาคเหนือ ภาคกลาง ภาคตะวันออกเฉียงเหนือ ภาคตะวันออก ภาคตะวันตก และภาคใต้"
+  },
+  {
+    q: "สัตว์ประจำชาติไทยคือสัตว์ชนิดใด",
+    o: ["ช้างไทย", "เสือโคร่ง", "ควายไทย", "นกยูง"],
+    a: 0,
+    e: "ช้างไทยเป็นสัตว์ประจำชาติ เป็นสัญลักษณ์ของความสง่าและความเจริญ"
+  },
+  {
+    q: "วันสงกรานต์ตรงกับวันที่เท่าไร",
+    o: ["1-3 มกราคม", "13-15 เมษายน", "12-14 สิงหาคม", "5-7 ธันวาคม"],
+    a: 1,
+    e: "สงกรานต์ตรงกับวันที่ 13-15 เมษายนของทุกปี เป็นวันปีใหม่ไทย"
+  },
+  {
+    q: "สกุลเงินของประเทศไทยคืออะไร",
+    o: ["ดอลลาร์", "บาท", "ริงกิต", "เปโซ"],
+    a: 1,
+    e: "สกุลเงินไทยคือ 'บาท' ใช้สัญลักษณ์ ฿"
+  },
+  {
+    q: "ภูเขาที่สูงที่สุดในประเทศไทยคือยอดใด",
+    o: ["ดอยสุเทพ", "ดอยอินทนนท์", "ดอยหลวงเชียงดาว", "ภูกระดึง"],
+    a: 1,
+    e: "ดอยอินทนนท์ จังหวัดเชียงใหม่ สูงประมาณ 2,565 เมตร"
+  },
+  {
+    q: "ดอกไม้ประจำชาติไทยคือดอกอะไร",
+    o: ["ดอกบัว", "ดอกราชพฤกษ์", "ดอกเข็ม", "ดอกมะลิ"],
+    a: 1,
+    e: "ดอกราชพฤกษ์ (ดอกคูน) เป็นดอกไม้ประจำชาติไทย"
+  },
+  {
+    q: "วันพ่อแห่งชาติของไทยตรงกับวันที่เท่าไร",
+    o: ["5 ธันวาคม", "12 สิงหาคม", "1 มิถุนายน", "14 กุมภาพันธ์"],
+    a: 0,
+    e: "วันที่ 5 ธันวาคม เป็นวันคล้ายวันพระราชสมภพของรัชกาลที่ 9 และเป็นวันพ่อแห่งชาติ"
+  },
+  {
+    q: "แม่น้ำสายใดยาวที่สุดในประเทศไทย",
+    o: ["แม่น้ำเจ้าพระยา", "แม่น้ำโขง", "แม่น้ำชี", "แม่น้ำปิง"],
+    a: 2,
+    e: "แม่น้ำชีเป็นแม่น้ำที่ยาวที่สุดที่ไหลอยู่ภายในประเทศไทย ยาวประมาณ 765 กิโลเมตร"
+  },
+  {
+    q: "อาหารไทยจานใดได้รับความนิยมไปทั่วโลก",
+    o: ["ผัดไทย", "ต้มยำกุ้ง", "ส้มตำ", "แกงเขียวหวาน"],
+    a: 1,
+    e: "ต้มยำกุ้งเป็นอาหารไทยที่ติดอันดับอาหารอร่อยที่สุดในโลกหลายสำนัก"
+  }
+];
+
+let order = [];
+let current = 0;
+let score = 0;
+let answered = false;
+let shuffledOptions = [];
+
+const $ = id => document.getElementById(id);
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start() {
+  order = shuffle([...Array(QUESTIONS.length).keys()]);
+  current = 0;
+  score = 0;
+  $('result').style.display = 'none';
+  $('question').style.display = 'block';
+  $('options').style.display = 'block';
+  $('progress').style.display = 'flex';
+  document.querySelector('.bar-wrap').style.display = 'block';
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const idx = order[current];
+  const data = QUESTIONS[idx];
+
+  $('progress').innerHTML = `<span>ข้อ ${current + 1} / ${QUESTIONS.length}</span><span>คะแนน: ${score}</span>`;
+  $('bar').style.width = ((current) / QUESTIONS.length * 100) + '%';
+  $('question').textContent = data.q;
+
+  // สุ่มตัวเลือก
+  const pairs = data.o.map((text, i) => ({ text, correct: i === data.a }));
+  shuffledOptions = shuffle(pairs);
+
+  const box = $('options');
+  box.innerHTML = '';
+  shuffledOptions.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = String.fromCharCode(3585 + i) + '. ' + opt.text; // ก ข ค ง
+    btn.onclick = () => choose(btn, opt.correct, data);
+    box.appendChild(btn);
+  });
+
+  $('feedback').className = 'feedback';
+  $('feedback').textContent = '';
+  $('nextBtn').style.display = 'none';
+}
+
+function choose(btn, isCorrect, data) {
+  if (answered) return;
+  answered = true;
+
+  const buttons = document.querySelectorAll('.option');
+  buttons.forEach(b => {
+    b.disabled = true;
+    const text = b.textContent.slice(3);
+    const correctText = data.o[data.a];
+    if (text === correctText) b.classList.add('correct');
+  });
+
+  if (isCorrect) {
+    score++;
+    $('feedback').className = 'feedback show correct-text';
+    $('feedback').textContent = '✓ ถูกต้อง! ' + data.e;
+  } else {
+    btn.classList.add('wrong');
+    $('feedback').className = 'feedback show wrong-text';
+    $('feedback').textContent = '✗ ยังไม่ถูก เฉลย: ' + data.o[data.a] + ' — ' + data.e;
+  }
+
+  $('progress').innerHTML = `<span>ข้อ ${current + 1} / ${QUESTIONS.length}</span><span>คะแนน: ${score}</span>`;
+  $('bar').style.width = ((current + 1) / QUESTIONS.length * 100) + '%';
+  $('nextBtn').style.display = 'block';
+  $('nextBtn').textContent = current === QUESTIONS.length - 1 ? 'ดูผลคะแนน' : 'ข้อถัดไป';
+}
+
+$('nextBtn').onclick = () => {
+  if (current < QUESTIONS.length - 1) {
+    current++;
+    loadQuestion();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  $('question').style.display = 'none';
+  $('options').style.display = 'none';
+  $('feedback').className = 'feedback';
+  $('nextBtn').style.display = 'none';
+  $('progress').style.display = 'none';
+  document.querySelector('.bar-wrap').style.display = 'none';
+  $('result').style.display = 'block';
+
+  $('scoreText').textContent = score + ' / ' + QUESTIONS.length;
+
+  let msg = '';
+  const pct = score / QUESTIONS.length;
+  if (pct === 1) msg = 'ยอดเยี่ยม! ตอบถูกทุกข้อ 🎉';
+  else if (pct >= 0.8) msg = 'เก่งมาก! เกือบเต็มแล้ว 👏';
+  else if (pct >= 0.5) msg = 'พอใช้ได้ ลองอีกครั้งนะ 💪';
+  else msg = 'อ่านเพิ่มเติมแล้วลองใหม่นะ 📚';
+
+  $('msgText').textContent = msg;
+}
+
+function restart() {
+  start();
+}
+
+start();
+</script>
+</body>
+  </html>
