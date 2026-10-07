@@ -1,336 +1,384 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>แบบทดสอบความรู้ทั่วไป 10 ข้อ</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Mobile 3D Game</title>
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Sarabun', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    margin: 0;
-    padding: 16px;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  .quiz-container {
-    background: #fff;
-    max-width: 640px;
-    width: 100%;
-    padding: 22px;
-    border-radius: 20px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-    margin-top: 8px;
-  }
-  h1 {
-    text-align: center;
-    color: #4c1d95;
-    margin: 0 0 6px;
-    font-size: 1.35rem;
-  }
-  .subtitle {
-    text-align: center;
-    color: #64748b;
-    font-size: 0.9rem;
-    margin-bottom: 18px;
-  }
-  .bar-wrap {
-    background: #e2e8f0;
-    height: 8px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  #bar {
-    height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    transition: width 0.3s;
-  }
-  #progress {
-    color: #64748b;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-  }
-  #question {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    line-height: 1.6;
-    color: #1e293b;
-  }
-  .option {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    background: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.15s;
-    font-family: inherit;
-    color: #1e293b;
-    line-height: 1.4;
-  }
-  .option:active:not(:disabled) { transform: scale(0.98); }
-  .option:disabled { cursor: default; }
-  .option.correct { background: #dcfce7; border-color: #22c55e; font-weight: 600; }
-  .option.wrong { background: #fee2e2; border-color: #ef4444; }
-  .option.correct::after { content: " ✓"; color: #16a34a; }
-  .option.wrong::after { content: " ✗"; color: #dc2626; }
-  .feedback {
-    margin: 12px 0;
-    padding: 12px 14px;
-    border-radius: 10px;
-    line-height: 1.55;
-    font-size: 0.95rem;
-    display: none;
-  }
-  .feedback.show { display: block; }
-  .correct-text { background: #f0fdf4; color: #166534; border-left: 4px solid #22c55e; }
-  .wrong-text { background: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; }
-  .btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 13px 24px;
-    border-radius: 12px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-family: inherit;
-    font-weight: 600;
-    width: 100%;
-    margin-top: 6px;
-    transition: 0.2s;
-  }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  #result { text-align: center; display: none; }
-  #result h2 { color: #4c1d95; margin-bottom: 8px; }
-  #result .score {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 8px 0;
-  }
-  #result .msg { color: #475569; margin-bottom: 18px; font-size: 1.05rem; }
+  html,body{margin:0;height:100%;overflow:hidden;background:#9ec9ee;overscroll-behavior:none;
+    touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;position:fixed;width:100%}
+  canvas{display:block;width:100%;height:100%;touch-action:none}
+  #joyZone{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));
+    width:190px;height:190px;display:flex;align-items:center;justify-content:center;touch-action:none;z-index:5}
+  #joyBase{width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.55);
+    position:relative;backdrop-filter:blur(2px)}
+  #joyKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;
+    background:rgba(255,255,255,.75);box-shadow:0 2px 8px rgba(0,0,0,.3);will-change:transform}
+  #loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:#1b2a3a;color:#fff;font:600 16px system-ui,sans-serif;z-index:10;transition:opacity .4s}
+  #loading small{opacity:.7;margin-top:8px;font-weight:400;text-align:center;padding:0 24px}
 </style>
 </head>
 <body>
-<div class="quiz-container">
-  <h1>แบบทดสอบความรู้ทั่วไป</h1>
-  <div class="subtitle">จำนวน 10 ข้อ</div>
-  <div class="bar-wrap"><div id="bar"></div></div>
+<div id="loading"><div id="loadText">กำลังโหลด… 0%</div><small id="loadNote"></small></div>
+<div id="joyZone"><div id="joyBase"><div id="joyKnob"></div></div></div>
 
-  <div id="progress"></div>
-  <div id="question"></div>
-  <div id="options"></div>
-  <div id="feedback" class="feedback"></div>
-  <button id="nextBtn" class="btn" style="display:none;">ข้อถัดไป</button>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 
-  <div id="result">
-    <h2>สรุปผลคะแนน</h2>
-    <div class="score" id="scoreText"></div>
-    <div class="msg" id="msgText"></div>
-    <button class="btn" onclick="restart()">ทำแบบทดสอบอีกครั้ง</button>
-  </div>
-</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-<script>
-const QUESTIONS = [
-  {
-    q: "เมืองหลวงของประเทศไทยคือจังหวัดใด",
-    o: ["เชียงใหม่", "กรุงเทพมหานคร", "ขอนแก่น", "ภูเก็ต"],
-    a: 1,
-    e: "กรุงเทพมหานครเป็นเมืองหลวงของประเทศไทย"
-  },
-  {
-    q: "ประเทศไทยมีทั้งหมดกี่จังหวัด",
-    o: ["72 จังหวัด", "75 จังหวัด", "76 จังหวัด", "77 จังหวัด"],
-    a: 3,
-    e: "ประเทศไทยมี 77 จังหวัด แบ่งเป็นภาคเหนือ ภาคกลาง ภาคตะวันออกเฉียงเหนือ ภาคตะวันออก ภาคตะวันตก และภาคใต้"
-  },
-  {
-    q: "สัตว์ประจำชาติไทยคือสัตว์ชนิดใด",
-    o: ["ช้างไทย", "เสือโคร่ง", "ควายไทย", "นกยูง"],
-    a: 0,
-    e: "ช้างไทยเป็นสัตว์ประจำชาติ เป็นสัญลักษณ์ของความสง่าและความเจริญ"
-  },
-  {
-    q: "วันสงกรานต์ตรงกับวันที่เท่าไร",
-    o: ["1-3 มกราคม", "13-15 เมษายน", "12-14 สิงหาคม", "5-7 ธันวาคม"],
-    a: 1,
-    e: "สงกรานต์ตรงกับวันที่ 13-15 เมษายนของทุกปี เป็นวันปีใหม่ไทย"
-  },
-  {
-    q: "สกุลเงินของประเทศไทยคืออะไร",
-    o: ["ดอลลาร์", "บาท", "ริงกิต", "เปโซ"],
-    a: 1,
-    e: "สกุลเงินไทยคือ 'บาท' ใช้สัญลักษณ์ ฿"
-  },
-  {
-    q: "ภูเขาที่สูงที่สุดในประเทศไทยคือยอดใด",
-    o: ["ดอยสุเทพ", "ดอยอินทนนท์", "ดอยหลวงเชียงดาว", "ภูกระดึง"],
-    a: 1,
-    e: "ดอยอินทนนท์ จังหวัดเชียงใหม่ สูงประมาณ 2,565 เมตร"
-  },
-  {
-    q: "ดอกไม้ประจำชาติไทยคือดอกอะไร",
-    o: ["ดอกบัว", "ดอกราชพฤกษ์", "ดอกเข็ม", "ดอกมะลิ"],
-    a: 1,
-    e: "ดอกราชพฤกษ์ (ดอกคูน) เป็นดอกไม้ประจำชาติไทย"
-  },
-  {
-    q: "วันพ่อแห่งชาติของไทยตรงกับวันที่เท่าไร",
-    o: ["5 ธันวาคม", "12 สิงหาคม", "1 มิถุนายน", "14 กุมภาพันธ์"],
-    a: 0,
-    e: "วันที่ 5 ธันวาคม เป็นวันคล้ายวันพระราชสมภพของรัชกาลที่ 9 และเป็นวันพ่อแห่งชาติ"
-  },
-  {
-    q: "แม่น้ำสายใดยาวที่สุดในประเทศไทย",
-    o: ["แม่น้ำเจ้าพระยา", "แม่น้ำโขง", "แม่น้ำชี", "แม่น้ำปิง"],
-    a: 2,
-    e: "แม่น้ำชีเป็นแม่น้ำที่ยาวที่สุดที่ไหลอยู่ภายในประเทศไทย ยาวประมาณ 765 กิโลเมตร"
-  },
-  {
-    q: "อาหารไทยจานใดได้รับความนิยมไปทั่วโลก",
-    o: ["ผัดไทย", "ต้มยำกุ้ง", "ส้มตำ", "แกงเขียวหวาน"],
-    a: 1,
-    e: "ต้มยำกุ้งเป็นอาหารไทยที่ติดอันดับอาหารอร่อยที่สุดในโลกหลายสำนัก"
-  }
-];
-
-let order = [];
-let current = 0;
-let score = 0;
-let answered = false;
-let shuffledOptions = [];
-
-const $ = id => document.getElementById(id);
-
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function start() {
-  order = shuffle([...Array(QUESTIONS.length).keys()]);
-  current = 0;
-  score = 0;
-  $('result').style.display = 'none';
-  $('question').style.display = 'block';
-  $('options').style.display = 'block';
-  $('progress').style.display = 'flex';
-  document.querySelector('.bar-wrap').style.display = 'block';
-  loadQuestion();
-}
-
-function loadQuestion() {
-  answered = false;
-  const idx = order[current];
-  const data = QUESTIONS[idx];
-
-  $('progress').innerHTML = `<span>ข้อ ${current + 1} / ${QUESTIONS.length}</span><span>คะแนน: ${score}</span>`;
-  $('bar').style.width = ((current) / QUESTIONS.length * 100) + '%';
-  $('question').textContent = data.q;
-
-  // สุ่มตัวเลือก
-  const pairs = data.o.map((text, i) => ({ text, correct: i === data.a }));
-  shuffledOptions = shuffle(pairs);
-
-  const box = $('options');
-  box.innerHTML = '';
-  shuffledOptions.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option';
-    btn.textContent = String.fromCharCode(3585 + i) + '. ' + opt.text; // ก ข ค ง
-    btn.onclick = () => choose(btn, opt.correct, data);
-    box.appendChild(btn);
-  });
-
-  $('feedback').className = 'feedback';
-  $('feedback').textContent = '';
-  $('nextBtn').style.display = 'none';
-}
-
-function choose(btn, isCorrect, data) {
-  if (answered) return;
-  answered = true;
-
-  const buttons = document.querySelectorAll('.option');
-  buttons.forEach(b => {
-    b.disabled = true;
-    const text = b.textContent.slice(3);
-    const correctText = data.o[data.a];
-    if (text === correctText) b.classList.add('correct');
-  });
-
-  if (isCorrect) {
-    score++;
-    $('feedback').className = 'feedback show correct-text';
-    $('feedback').textContent = '✓ ถูกต้อง! ' + data.e;
-  } else {
-    btn.classList.add('wrong');
-    $('feedback').className = 'feedback show wrong-text';
-    $('feedback').textContent = '✗ ยังไม่ถูก เฉลย: ' + data.o[data.a] + ' — ' + data.e;
-  }
-
-  $('progress').innerHTML = `<span>ข้อ ${current + 1} / ${QUESTIONS.length}</span><span>คะแนน: ${score}</span>`;
-  $('bar').style.width = ((current + 1) / QUESTIONS.length * 100) + '%';
-  $('nextBtn').style.display = 'block';
-  $('nextBtn').textContent = current === QUESTIONS.length - 1 ? 'ดูผลคะแนน' : 'ข้อถัดไป';
-}
-
-$('nextBtn').onclick = () => {
-  if (current < QUESTIONS.length - 1) {
-    current++;
-    loadQuestion();
-  } else {
-    showResult();
-  }
+/* ================= CONFIG ================= */
+const CFG = {
+  modelUrl: 'character.glb',
+  walkFbxUrl: 'walk.fbx',      // แอนิเมชันเดิน (Mixamo) จะถูก retarget เข้ากับโมเดล
+  charHeight: 1.45,            // ความสูง (ระดับหัว) ของตัวละครในฉาก
+  maxSpeed: 3.4,
+  turnSharpness: 10,
+  camDist: 5, camHeight: 2.6, camLookHeight: 1.1, camSharpness: 5,
+  joyRadius: 50,
+  hideNodes: null              // เช่น /garbage|bottle/i เพื่อซ่อนพร็อพที่ติดมากับโมเดล
 };
 
-function showResult() {
-  $('question').style.display = 'none';
-  $('options').style.display = 'none';
-  $('feedback').className = 'feedback';
-  $('nextBtn').style.display = 'none';
-  $('progress').style.display = 'none';
-  document.querySelector('.bar-wrap').style.display = 'none';
-  $('result').style.display = 'block';
+/* ================= STATE ================= */
+let renderer, scene, camera, clock, sun;
+let player, model, mixer, actions = {}, currentAction = null, isMoving = false;
+const joy = { x: 0, y: 0, mag: 0, id: null };
+const cam = { yaw: 0, id: null, lastX: 0, target: new THREE.Vector3() };
+const loadingEl = document.getElementById('loading');
+const loadText = document.getElementById('loadText');
 
-  $('scoreText').textContent = score + ' / ' + QUESTIONS.length;
+init();
 
-  let msg = '';
-  const pct = score / QUESTIONS.length;
-  if (pct === 1) msg = 'ยอดเยี่ยม! ตอบถูกทุกข้อ 🎉';
-  else if (pct >= 0.8) msg = 'เก่งมาก! เกือบเต็มแล้ว 👏';
-  else if (pct >= 0.5) msg = 'พอใช้ได้ ลองอีกครั้งนะ 💪';
-  else msg = 'อ่านเพิ่มเติมแล้วลองใหม่นะ 📚';
+/* ================= INIT ================= */
+function init() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  document.body.prepend(renderer.domElement);
 
-  $('msgText').textContent = msg;
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9ec9ee);
+  scene.fog = new THREE.Fog(0x9ec9ee, 20, 60);
+
+  camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 150);
+  clock = new THREE.Clock();
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x5a6a4a, 1.0));
+  sun = new THREE.DirectionalLight(0xffffff, 2.0);
+  sun.position.set(6, 12, 5);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 40 });
+  sun.shadow.bias = -0.0005;
+  scene.add(sun, sun.target);
+
+  scene.add(makeGround());
+  player = new THREE.Group();
+  scene.add(player);
+
+  setupJoystick();
+  setupCameraDrag();
+  setupPageLocks();
+  addEventListener('resize', onResize);
+  addEventListener('orientationchange', () => setTimeout(onResize, 250));
+
+  loadCharacter();
+  renderer.setAnimationLoop(animate);
 }
 
-function restart() {
-  start();
+function makeGround() {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d');
+  g.fillStyle = '#7fae6b'; g.fillRect(0, 0, 256, 256);
+  g.fillStyle = '#76a562'; g.fillRect(0, 0, 128, 128); g.fillRect(128, 128, 128, 128);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(100, 100);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(400, 400),
+    new THREE.MeshStandardMaterial({ map: t, roughness: 1 }));
+  m.rotation.x = -Math.PI / 2; m.receiveShadow = true;
+  return m;
 }
 
-start();
+/* ================= LOADING MODEL + ANIMATION ================= */
+function loadCharacter() {
+  new GLTFLoader().load(CFG.modelUrl, async (gltf) => {
+    model = gltf.scene;
+    model.traverse(o => {
+      if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false; }
+      if (CFG.hideNodes && CFG.hideNodes.test(o.name)) o.visible = false;
+    });
+    player.add(model);
+    normalizeModel(model);
+    mixer = new THREE.AnimationMixer(model);
+
+    let idleClip = null, walkClip = null;
+    // 1) ใช้แอนิเมชันที่ติดมากับ GLB ถ้ามี (ตัวแรก = Idle)
+    if (gltf.animations.length) {
+      idleClip = gltf.animations[0];
+      walkClip = gltf.animations.find(a => /walk|run/i.test(a.name)) || gltf.animations[1] || null;
+    }
+    // 2) ถ้าไม่มี Walk ให้โหลดจาก FBX แล้ว retarget
+    if (!walkClip) {
+      try { walkClip = await loadRetargetedWalk(model); }
+      catch (e) { console.warn('โหลด walk.fbx ไม่สำเร็จ:', e); }
+    }
+    if (!idleClip) idleClip = makeIdleClip(model);
+
+    actions.idle = mixer.clipAction(idleClip);
+    if (walkClip) actions.walk = mixer.clipAction(walkClip);
+    actions.idle.play(); currentAction = actions.idle;
+
+    loadingEl.style.opacity = 0;
+    setTimeout(() => loadingEl.remove(), 450);
+  }, (e) => {
+    if (e.total) loadText.textContent = `กำลังโหลด… ${Math.round(e.loaded / e.total * 100)}%`;
+  }, (err) => {
+    console.error(err);
+    loadText.textContent = 'โหลดโมเดลไม่สำเร็จ';
+    document.getElementById('loadNote').textContent =
+      'ต้องเปิดผ่านเว็บเซิร์ฟเวอร์ (ไม่ใช่ file://) และวาง character.glb ไว้โฟลเดอร์เดียวกับ index.html';
+  });
+}
+
+function normalizeModel(m) {
+  m.updateMatrixWorld(true);
+  const head = findBone(m, /^Head_\d+$/), toe = findBone(m, /^Toes_R_\d+$/) || findBone(m, /^Foot_R_\d+$/);
+  let s = 1, floor = 0;
+  if (head && toe) {
+    const hy = head.getWorldPosition(new THREE.Vector3()).y, ty = toe.getWorldPosition(new THREE.Vector3()).y;
+    s = CFG.charHeight / Math.max(0.01, hy - ty);
+    m.scale.multiplyScalar(s);
+    m.updateMatrixWorld(true);
+    floor = toe.getWorldPosition(new THREE.Vector3()).y;
+    m.position.y -= floor;
+  } else {
+    const b = new THREE.Box3().setFromObject(m);
+    s = CFG.charHeight / Math.max(0.01, b.max.y - b.min.y);
+    m.scale.multiplyScalar(s); m.updateMatrixWorld(true);
+    m.position.y -= new THREE.Box3().setFromObject(m).min.y;
+  }
+  m.updateMatrixWorld(true);
+}
+
+function findBone(root, re) {
+  let r = null;
+  root.traverse(o => { if (!r && o.isBone && re.test(o.name)) r = o; });
+  return r;
+}
+
+/* ---------- Mixamo FBX -> โครงกระดูกของโมเดล (retarget) ---------- */
+function targetBones(model) {
+  const map = {
+    Hips: /^Hips_\d+$/, Spine: /^Spine_\d+$/, Spine1: /^Chest_\d+$/, Neck: /^Neck_\d+$/, Head: /^Head_\d+$/
+  };
+  for (const [S, s] of [['Left', 'L'], ['Right', 'R']]) {
+    map[S + 'Shoulder'] = new RegExp(`^Shoulder_${s}_\\d+$`);
+    map[S + 'Arm'] = new RegExp(`^UpperArm_${s}_\\d+$`);
+    map[S + 'ForeArm'] = new RegExp(`^LowerArm_${s}_\\d+$`);
+    map[S + 'Hand'] = new RegExp(`^Hand_${s}_\\d+$`);
+    map[S + 'UpLeg'] = new RegExp(`^UpperLeg_${s}_\\d+$`);
+    map[S + 'Leg'] = new RegExp(`^LowerLeg_${s}_\\d+$`);
+    map[S + 'Foot'] = new RegExp(`^Foot_${s}_\\d+$`);
+    map[S + 'ToeBase'] = new RegExp(`^Toes_${s}_\\d+$`);
+  }
+  const out = {};
+  for (const k in map) { const b = findBone(model, map[k]); if (b) out[k] = b; }
+  return out;
+}
+
+function loadRetargetedWalk(model) {
+  return new Promise((resolve, reject) => {
+    new FBXLoader().load(CFG.walkFbxUrl, (fbx) => {
+      const clip = fbx.animations[0];
+      if (!clip) return reject(new Error('FBX ไม่มี animation'));
+      fbx.updateMatrixWorld(true); model.updateMatrixWorld(true);
+      const B = targetBones(model), tracks = [];
+      const qS = new THREE.Quaternion(), qR = new THREE.Quaternion();
+      for (const tr of clip.tracks) {
+        const m = tr.name.match(/^mixamorig:?(\w+)\.quaternion$/);   // ข้าม position/scale = เดินอยู่กับที่ (in-place)
+        if (!m || !B[m[1]]) continue;
+        const sb = fbx.getObjectByName(tr.name.split('.')[0]), tb = B[m[1]];
+        if (!sb || !sb.parent || !tb.parent) continue;
+        const sParent = sb.parent.getWorldQuaternion(new THREE.Quaternion());
+        const sRestInv = sb.getWorldQuaternion(new THREE.Quaternion()).invert();
+        const tParentInv = tb.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
+        const tRest = tb.getWorldQuaternion(new THREE.Quaternion());
+        const vals = new Float32Array(tr.values.length);
+        for (let i = 0; i < tr.values.length; i += 4) {
+          qS.fromArray(tr.values, i);
+          qR.copy(tParentInv).multiply(sParent).multiply(qS).multiply(sRestInv).multiply(tRest);
+          qR.toArray(vals, i);
+        }
+        tracks.push(new THREE.QuaternionKeyframeTrack(`${tb.name}.quaternion`, tr.times, vals));
+      }
+      resolve(new THREE.AnimationClip('Walk', clip.duration, tracks));
+    }, undefined, reject);
+  });
+}
+
+/* ---------- Idle แบบ procedural (กรณี GLB ไม่มีแอนิเมชัน) ---------- */
+function makeIdleClip(model) {
+  const B = targetBones(model), tracks = [], times = [0, 1.5, 3];
+  const sway = (key, axis, amp) => {
+    const b = B[key]; if (!b) return;
+    const q0 = b.quaternion.clone();
+    const q1 = q0.clone().multiply(new THREE.Quaternion().setFromAxisAngle(axis, amp));
+    tracks.push(new THREE.QuaternionKeyframeTrack(`${b.name}.quaternion`, times,
+      [...q0.toArray(), ...q1.toArray(), ...q0.toArray()]));
+  };
+  const X = new THREE.Vector3(1, 0, 0), Z = new THREE.Vector3(0, 0, 1);
+  sway('Spine', X, 0.025); sway('Spine1', X, 0.035); sway('Head', X, -0.04); sway('Neck', X, -0.02);
+  sway('LeftShoulder', Z, 0.03); sway('RightShoulder', Z, -0.03);
+  return new THREE.AnimationClip('Idle', 3, tracks);
+}
+
+/* ================= JOYSTICK (touch + mouse fallback) ================= */
+function setupJoystick() {
+  const zone = document.getElementById('joyZone');
+  const base = document.getElementById('joyBase');
+  const knob = document.getElementById('joyKnob');
+
+  const update = (cx, cy) => {
+    const r = base.getBoundingClientRect();
+    let dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy), k = d > CFG.joyRadius ? CFG.joyRadius / d : 1;
+    dx *= k; dy *= k;
+    knob.style.transform = `translate(${dx}px,${dy}px)`;
+    joy.x = dx / CFG.joyRadius; joy.y = dy / CFG.joyRadius;
+    joy.mag = Math.min(1, Math.hypot(joy.x, joy.y));
+  };
+  const reset = () => {
+    joy.id = null; joy.x = joy.y = joy.mag = 0;
+    knob.style.transform = 'translate(0,0)';
+  };
+  const getTouch = (e, id) => [...e.changedTouches].find(t => t.identifier === id);
+
+  zone.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (joy.id !== null) return;
+    const t = e.changedTouches[0]; joy.id = t.identifier; update(t.clientX, t.clientY);
+  }, { passive: false });
+  zone.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = getTouch(e, joy.id); if (t) update(t.clientX, t.clientY);
+  }, { passive: false });
+  const end = (e) => { e.preventDefault(); if (getTouch(e, joy.id)) reset(); };
+  zone.addEventListener('touchend', end, { passive: false });
+  zone.addEventListener('touchcancel', end, { passive: false });
+
+  // เมาส์ (ไว้ทดสอบบนคอมพิวเตอร์)
+  let md = false;
+  zone.addEventListener('mousedown', (e) => { md = true; update(e.clientX, e.clientY); });
+  addEventListener('mousemove', (e) => { if (md) update(e.clientX, e.clientY); });
+  addEventListener('mouseup', () => { if (md) { md = false; reset(); } });
+}
+
+/* ลากนิ้วบนฉาก (นอกจอยสติ๊ก) เพื่อหมุนกล้อง */
+function setupCameraDrag() {
+  const el = renderer.domElement;
+  const find = (e) => [...e.changedTouches].find(t => t.identifier === cam.id);
+  el.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (cam.id !== null) return;
+    const t = e.changedTouches[0]; cam.id = t.identifier; cam.lastX = t.clientX;
+  }, { passive: false });
+  el.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = find(e); if (!t) return;
+    cam.yaw -= (t.clientX - cam.lastX) * 0.007; cam.lastX = t.clientX;
+  }, { passive: false });
+  const end = (e) => { if (find(e)) cam.id = null; };
+  el.addEventListener('touchend', end); el.addEventListener('touchcancel', end);
+}
+
+/* บล็อกซูม/สกรอลล์ */
+function setupPageLocks() {
+  const stop = (e) => e.preventDefault();
+  ['gesturestart', 'gesturechange', 'gestureend', 'contextmenu'].forEach(n => document.addEventListener(n, stop));
+  document.addEventListener('touchmove', stop, { passive: false });
+  let last = 0;
+  document.addEventListener('touchend', (e) => {           // กัน double-tap zoom บน iOS
+    const now = Date.now(); if (now - last < 300) e.preventDefault(); last = now;
+  }, { passive: false });
+}
+
+/* ================= GAMEPLAY ================= */
+function updateGameplay(dt) {
+  const moving = joy.mag > 0.12;
+
+  if (moving) {
+    // ทิศทางเทียบกับกล้อง: ดันขึ้น = เดินไปข้างหน้า (ออกจากกล้อง)
+    const sy = Math.sin(cam.yaw), cy = Math.cos(cam.yaw);
+    const fx = -sy, fz = -cy, rx = cy, rz = -sy;
+    const mx = fx * -joy.y + rx * joy.x, mz = fz * -joy.y + rz * joy.x;
+    const len = Math.hypot(mx, mz) || 1, dx = mx / len, dz = mz / len;
+
+    const speed = CFG.maxSpeed * joy.mag;
+    player.position.x += dx * speed * dt;
+    player.position.z += dz * speed * dt;
+
+    // หมุนตัวแบบ smooth (shortest angle)
+    const target = Math.atan2(dx, dz);
+    let diff = Math.atan2(Math.sin(target - player.rotation.y), Math.cos(target - player.rotation.y));
+    player.rotation.y += diff * (1 - Math.exp(-CFG.turnSharpness * dt));
+
+    if (actions.walk) actions.walk.timeScale = 0.6 + joy.mag * 0.9;
+  }
+
+  if (moving !== isMoving) {
+    isMoving = moving;
+    fadeTo(moving && actions.walk ? actions.walk : actions.idle);
+  }
+
+  // แสง/เงาตามตัวละคร
+  sun.position.set(player.position.x + 6, 12, player.position.z + 5);
+  sun.target.position.copy(player.position);
+
+  // กล้องบุคคลที่สาม ตามหลังอย่างนุ่มนวล
+  const want = new THREE.Vector3(
+    player.position.x + Math.sin(cam.yaw) * CFG.camDist,
+    CFG.camHeight,
+    player.position.z + Math.cos(cam.yaw) * CFG.camDist);
+  camera.position.lerp(want, 1 - Math.exp(-CFG.camSharpness * dt));
+  cam.target.lerp(new THREE.Vector3(player.position.x, CFG.camLookHeight, player.position.z),
+    1 - Math.exp(-CFG.camSharpness * 2 * dt));
+  camera.lookAt(cam.target);
+}
+
+function fadeTo(next) {
+  if (!next || next === currentAction) return;
+  next.reset().setEffectiveWeight(1).play();
+  if (currentAction) currentAction.crossFadeTo(next, 0.3, false);
+  currentAction = next;
+}
+
+/* ================= LOOP / RESIZE ================= */
+function animate() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (model) updateGameplay(dt);
+  if (mixer) mixer.update(dt);
+  renderer.render(scene, camera);
+}
+
+function onResize() {
+  const w = innerWidth, h = innerHeight;
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
 </script>
 </body>
-  </html>
+</html>
